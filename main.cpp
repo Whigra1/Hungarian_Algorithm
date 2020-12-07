@@ -9,24 +9,26 @@ struct point{
 };
 
 int** create_array(int size) {
-//    srand(time(NULL));
-//    int** array = new int *[size];
-//    for (int i = 0; i < size; i++) {
-//    array[i] = new int[size];
-//        for (int l = 0; l < size; l++) {
-//            array[i][l] = (rand() % 25) + 1;
-//        }
-//    }
-    int **array = new int *[size];
+    srand(time(NULL));
+    int** array = new int *[size];
     for (int i = 0; i < size; i++) {
-        array[i] = new int[size];
+    array[i] = new int[size];
+        for (int l = 0; l < size; l++) {
+            array[i][l] = (rand() % 20) + 1;
+        }
     }
+
+//    int **array = new int *[size];
+//    for (int i = 0; i < size; i++) {
+//        array[i] = new int[size];
+//    }
 //    array[0][0] = 2500; array[0][1] = 4000; array[0][2] = 3500;
 //    array[1][0] = 4000; array[1][1] = 6000; array[1][2] = 3500;
 //    array[2][0] = 2000; array[2][1] = 4000; array[2][2] = 2500;
-    array[0][0] = 1500; array[0][1] = 4000; array[0][2] = 4500;
-    array[1][0] = 2000; array[1][1] = 6000; array[1][2] = 3500;
-    array[2][0] = 2000; array[2][1] = 4000; array[2][2] = 2500;
+
+//    array[0][0] = 1500; array[0][1] = 4000; array[0][2] = 4500;
+//    array[1][0] = 2000; array[1][1] = 6000; array[1][2] = 3500;
+//    array[2][0] = 2000; array[2][1] = 4000; array[2][2] = 2500;
     return array;
 }
 
@@ -130,11 +132,28 @@ void change_to_unused_state(point** array, int size, int column_index) {
     }
 }
 
-bool find_zero_in_column_and_change_its_state(point** array, int size, int column_index){
+bool rec2(point** new_array, int size, int column, int start_column){
+    if (start_column == column) return false;
+    int count = 0;
     for (int i = 0; i < size; i++) {
-        if (array[i][column_index].number == 0 && find_used_zero(array, size, i) == -1){
-            array[i][column_index].used = 1;
-            return true;
+        if (new_array[i][column].number == 0) {
+            count++;
+            int index = find_used_zero(new_array, size, i);
+            if (index == -1){
+                change_to_unused_state(new_array, size, column);
+                new_array[i][column].used = 1;
+                return true;
+            }
+        }
+    }
+    if (count == 1) return false;
+    for (int l = 0; l < size; l++) {
+        if (new_array[l][column].number == 0) {
+            int column_index = find_used_zero(new_array, size, l);
+            if (rec2(new_array, size, column_index, start_column)) {
+                new_array[l][column].used = 1;
+                return true;
+            }
         }
     }
     return false;
@@ -148,26 +167,23 @@ void rec(point** new_array, int size, int i){
             if (index == -1) {
                 flag = true;
                 new_array[l][i].used = 1;
-                out(new_array, size);
                 break;
             }
         }
     }
-    if (!flag) {
+    if (!flag){
         for (int l = 0; l < size; l++) {
             if (new_array[l][i].number == 0) {
-                for (int j = 0; j < size; j++){
-                    int index = find_used_zero(new_array, size, j);
-                    if ( new_array[j][i].number == 0 && index != -1){
-                        change_to_unused_state(new_array, size, index);
-                        new_array[j][i].used = 1;
-                        find_zero_in_column_and_change_its_state(new_array, size, index);
-                        break;
-                    }
-                }
+                int column_index = find_used_zero(new_array, size, l);
+                if (rec2(new_array, size, column_index, i)) {
+                    new_array[l][i].used = 1;
+                    new_array[l][column_index].used = 0;
+                    break;
+                } else new_array[l][i].used = 2;
             }
         }
     }
+    out(new_array, size);
 }
 
 point** set_zeros(int** array, int size){
@@ -176,6 +192,13 @@ point** set_zeros(int** array, int size){
         rec(new_array, size, i);
     }
     return new_array;
+}
+
+point** set_zeros(point** array, int size){
+    for (int i = 0; i < size; i++) {
+        rec(array, size, i);
+    }
+    return array;
 }
 
 int find_sum(int** array, point** point_array, int size){
@@ -205,10 +228,43 @@ bool check_every_column(point** array, int size){
     return true;
 }
 
-void second_step(point**, int size){
-    bool rows = new bool[size];
-    bool columns = new bool[size];
-
+void second_step(point** array, int size) {
+    bool *rows = new bool[size];
+    bool *columns = new bool[size];
+    for (int i = 0; i < size; i++) {
+        rows[i] = false;
+        columns[i] = false;
+    }
+    bool flag = false;
+    for (int i = 0; i < size; i++) {
+        for (int l = 0; l < size; l++) {
+            if (array[l][i].used == 1) {
+                for (int j = 0; j < size; j++) {
+                    if (array[l][j].used == 2) {
+                        rows[l] = true;
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+            if (flag) break;
+        }
+        if (!flag) columns[i] = true;
+    }
+    int min = INT16_MAX;
+    for (int i = 0; i < size; i++) {
+        for (int l = 0; l < size; l++) {
+            if (!rows[i] && !columns[l])
+                if (min > array[i][l].number) min = array[i][l].number;
+        }
+    }
+    for (int i = 0; i < size; i++) {
+        for (int l = 0; l < size; l++) {
+            if (!rows[i] && !columns[l]) array[i][l].number-= min;
+            if (rows[i] && columns[l]) array[i][l].number+= min;
+            array[i][l].used = 0;
+        }
+    }
 }
 
 void work_with_matrix(int** array, int size){
@@ -216,17 +272,21 @@ void work_with_matrix(int** array, int size){
     out(array ,size);
     work_with_rows(array, size);
     work_with_columns(array, size);
-    out(array, size);
     point** final_array = set_zeros(array, size);
     if (!check_every_column(final_array, size)) {
-
+        second_step(final_array, size);
+        final_array = set_zeros(final_array, size);
     }
     int sum = find_sum(initial_array, final_array, size);
     cout << "SUM: " << sum << endl;
 }
 
+void start(int size){
+    int** a = create_array(size);
+    work_with_matrix(a, size);
+}
+
 int main() {
-    int** a = create_array(3);
-    work_with_matrix(a, 3);
+    start(3);
     return 0;
 }
