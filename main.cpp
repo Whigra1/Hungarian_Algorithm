@@ -74,7 +74,7 @@ int find_min_in_column(int** array, int column_index, int size){
     return min;
 }
 
-void work_with_rows(int** array, int size){
+void delete_min_from_rows(int** array, int size){
     for (int i = 0; i < size; i++) {
         int min = find_min_in_row(array[i], size);
         for (int l = 0; l < size; l++) {
@@ -83,7 +83,7 @@ void work_with_rows(int** array, int size){
     }
 }
 
-void work_with_columns(int** array, int size){
+void delete_min_from_columns(int** array, int size){
     for (int l = 0; l < size; l++) {
         int min = find_min_in_column(array, l, size);
         for (int i = 0; i < size; i++) {
@@ -270,8 +270,8 @@ void second_step(point** array, int size) {
 void work_with_matrix(int** array, int size){
     int** initial_array = copy_int_array(array, size);
     out(array ,size);
-    work_with_rows(array, size);
-    work_with_columns(array, size);
+    delete_min_from_rows(array, size);
+    delete_min_from_columns(array, size);
     point** final_array = set_zeros(array, size);
     if (!check_every_column(final_array, size)) {
         second_step(final_array, size);
