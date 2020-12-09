@@ -9,19 +9,20 @@ struct point{
 };
 
 int** create_array(int size) {
-//    srand(time(NULL));
-//    int** array = new int *[size];
+    srand(time(NULL));
+    int** array = new int *[size];
+    for (int i = 0; i < size; i++) {
+    array[i] = new int[size];
+        for (int l = 0; l < size; l++) {
+            array[i][l] = (rand() % 20) + 1;
+        }
+    }
+
+//    int **array = new int *[size];
 //    for (int i = 0; i < size; i++) {
-//    array[i] = new int[size];
-//        for (int l = 0; l < size; l++) {
-//            array[i][l] = (rand() % 20) + 1;
-//        }
+//        array[i] = new int[size];
 //    }
 
-    int **array = new int *[size];
-    for (int i = 0; i < size; i++) {
-        array[i] = new int[size];
-    }
 //    array[0][0] = 2500; array[0][1] = 4000; array[0][2] = 3500;
 //    array[1][0] = 4000; array[1][1] = 6000; array[1][2] = 3500;
 //    array[2][0] = 2000; array[2][1] = 4000; array[2][2] = 2500;
@@ -30,9 +31,10 @@ int** create_array(int size) {
 //    array[1][0] = 2000; array[1][1] = 6000; array[1][2] = 3500;
 //    array[2][0] = 2000; array[2][1] = 4000; array[2][2] = 2500;
 
-    array[0][0] = 11; array[0][1] = 3; array[0][2] = 4;
-    array[1][0] = 19; array[1][1] = 13; array[1][2] = 13;
-    array[2][0] = 17; array[2][1] = 8; array[2][2] = 12;
+//    array[0][0] = 11; array[0][1] = 3; array[0][2] = 4;
+//    array[1][0] = 19; array[1][1] = 13; array[1][2] = 13;
+//    array[2][0] = 17; array[2][1] = 8; array[2][2] = 12;
+
     return array;
 }
 
@@ -239,12 +241,6 @@ void second_step(point** array, int size) {
         rows[i] = false;
         columns[i] = false;
     }
-//    for (int i = 0; i < size; i++) {
-//        for (int l = 0; l < size; l++) {
-//            if (array[l][i].used == 1) {
-//            }
-//        }
-//    }
     bool flag = false;
     for (int i = 0; i < size; i++) {
         for (int l = 0; l < size; l++) {
@@ -298,14 +294,21 @@ void second_step(point** array, int size) {
 void work_with_matrix(int** array, int size){
     int** initial_array = copy_int_array(array, size);
     out(array ,size);
+
+    cout << "DELETING ELEMENTS!" << endl;
     delete_min_from_rows(array, size);
     delete_min_from_columns(array, size);
+    out(array ,size);
+
+    cout << "First STEP!" << endl;
     point** final_array = set_zeros(array, size);
+
     if (!check_every_column_has_zero(final_array, size)) {
         cout << "Second STEP!" << endl;
         second_step(final_array, size);
-        final_array = set_zeros(final_array, size);
+        set_zeros(final_array, size);
     }
+
     int sum = find_sum(initial_array, final_array, size);
     cout << "SUM: " << sum << endl;
 }

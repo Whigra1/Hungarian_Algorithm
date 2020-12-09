@@ -1,28 +1,49 @@
 DESCRIPTION
 
-Let there be n agents and n tasks. Any agent can be assigned to perform any task, 
-incurring some cost that may vary depending on the agent-task assignment. 
-It is required to perform all tasks by assigning exactly one agent to each 
-task and exactly one task to each agent in such a way that the total cost of the 
-assignment is minimized. Example: You work as a manager for a chip manufacturer, 
-and you currently have 3 people on the road meeting clients. Your salespeople are in 
-Jaipur, Pune and Bangalore, and you want them to fly to three other cities: Delhi, 
-Mumbai and Kerala. The table below shows the cost of airline tickets in INR between the cities:
+In this practice we have to understand how hungarian algorithm works.
+First of all we need to understand in which areas we have to use it.
+If we speak about tasks like planning, and when we want to get the best 
+result of our combination than we need bruteforce. If we have very small 
+amount of data than we can try. But if we speak about large data, than it is 
+the worst variant.
+In this situation hungarian algorithm can help us to solve this combination's 
+problem much faster compare to another variants.
 
-![Test Image 1](images/1.jpg)
+But it will be better if I describe some specific example. 
 
-The question: where would you send each of your salespeople in order to minimize fair?
+**EXAMPLE**
 
-Possible assignment: Cost = 11000 INR
+We have some two dimensions array. And we want to find min element from each 
+column but also we can choice only one element from each row too.
 
-![Test Image 1](images/2.jpg)
+![Test Image 1](images/2.png)
 
-Other Possible assignment: Cost = 9500 INR and this is the best of the 3! possible assignments.
+First Step is to find min element for each column and subtract it from each 
+element of current column. Then we have to do the same with rows.
+We get something like this:
 
-![Test Image 1](images/3.jpg)
+![Test Image 1](images/3.png)
 
-Brute force solution is to consider every possible assignment implies a complexity of Ω(n!).
+Second Step is to choice zero for each column and only one in column.
+But at the same time we have to take into account that for each row we have to
+take only one zero. If for some column we have different variants we mast take 
+into consideration aor choice for next columns.
+It is possible that for some columns we cannot choice zero, because
+this row is not free than we have to point this zero
 
-The Hungarian algorithm, aka Munkres assignment algorithm, utilizes the following theorem for polynomial runtime complexity (worst case O(n3)) and guaranteed optimality: If a number is added to or subtracted from all of the entries of any one row or column of a cost matrix, then an optimal assignment for the resulting cost matrix is also an optimal assignment for the original cost matrix.
+![Test Image 1](images/4.png)
 
-We reduce our original weight matrix to contain zeros, by using the above theorem. We try to assign tasks to agents such that each agent is doing only one task and the penalty incurred in each case is zero.
+In this step we have to understand which columns are used and which columns have 
+collisions. If on the same row there are used zero and unused than we have to take this row.
+Columns and rows form some structure of used elements, we have to find min elements
+among unused and subtract it from each unused element and add to elements which are
+at the intersection of used columns and rows.
+
+After that we can repeat the previous step more one time.
+
+![Test Image 1](images/5.png)
+
+Then we take elements from initial array by indexes of used zeros and add them.
+
+![Test Image 1](images/6.png)
+ 
