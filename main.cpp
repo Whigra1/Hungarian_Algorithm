@@ -9,19 +9,19 @@ struct point{
 };
 
 int** create_array(int size) {
-    srand(time(NULL));
-    int** array = new int *[size];
-    for (int i = 0; i < size; i++) {
-    array[i] = new int[size];
-        for (int l = 0; l < size; l++) {
-            array[i][l] = (rand() % 20) + 1;
-        }
-    }
-
-//    int **array = new int *[size];
+//    srand(time(NULL));
+//    int** array = new int *[size];
 //    for (int i = 0; i < size; i++) {
-//        array[i] = new int[size];
+//    array[i] = new int[size];
+//        for (int l = 0; l < size; l++) {
+//            array[i][l] = (rand() % 20) + 1;
+//        }
 //    }
+
+    int **array = new int *[size];
+    for (int i = 0; i < size; i++) {
+        array[i] = new int[size];
+    }
 //    array[0][0] = 2500; array[0][1] = 4000; array[0][2] = 3500;
 //    array[1][0] = 4000; array[1][1] = 6000; array[1][2] = 3500;
 //    array[2][0] = 2000; array[2][1] = 4000; array[2][2] = 2500;
@@ -29,6 +29,10 @@ int** create_array(int size) {
 //    array[0][0] = 1500; array[0][1] = 4000; array[0][2] = 4500;
 //    array[1][0] = 2000; array[1][1] = 6000; array[1][2] = 3500;
 //    array[2][0] = 2000; array[2][1] = 4000; array[2][2] = 2500;
+
+    array[0][0] = 11; array[0][1] = 3; array[0][2] = 4;
+    array[1][0] = 19; array[1][1] = 13; array[1][2] = 13;
+    array[2][0] = 17; array[2][1] = 8; array[2][2] = 12;
     return array;
 }
 
@@ -214,7 +218,7 @@ int find_sum(int** array, point** point_array, int size){
     return sum;
 }
 
-bool check_every_column(point** array, int size){
+bool check_every_column_has_zero(point** array, int size){
     for (int i = 0; i < size; i++) {
         bool flag = false;
         for (int l = 0; l < size; l++){
@@ -235,6 +239,12 @@ void second_step(point** array, int size) {
         rows[i] = false;
         columns[i] = false;
     }
+//    for (int i = 0; i < size; i++) {
+//        for (int l = 0; l < size; l++) {
+//            if (array[l][i].used == 1) {
+//            }
+//        }
+//    }
     bool flag = false;
     for (int i = 0; i < size; i++) {
         for (int l = 0; l < size; l++) {
@@ -249,7 +259,15 @@ void second_step(point** array, int size) {
             }
             if (flag) break;
         }
-        if (!flag) columns[i] = true;
+        if (!flag) {
+            for (int l = 0; l < size; l++) {
+                if (array[l][i].used == 1) {
+                    columns[i] = true;
+                    break;
+                }
+            }
+        }
+        flag = false;
     }
     int min = INT16_MAX;
     for (int i = 0; i < size; i++) {
@@ -258,6 +276,16 @@ void second_step(point** array, int size) {
                 if (min > array[i][l].number) min = array[i][l].number;
         }
     }
+    cout << "ROWS";
+    for (int i = 0; i < size; i++) {
+        cout << " " << rows[i];
+    }
+    cout << endl;
+    cout << "COLUMNS";
+    for (int i = 0; i < size; i++) {
+        cout << " " << columns[i];
+    }
+    cout << endl;
     for (int i = 0; i < size; i++) {
         for (int l = 0; l < size; l++) {
             if (!rows[i] && !columns[l]) array[i][l].number-= min;
@@ -273,7 +301,8 @@ void work_with_matrix(int** array, int size){
     delete_min_from_rows(array, size);
     delete_min_from_columns(array, size);
     point** final_array = set_zeros(array, size);
-    if (!check_every_column(final_array, size)) {
+    if (!check_every_column_has_zero(final_array, size)) {
+        cout << "Second STEP!" << endl;
         second_step(final_array, size);
         final_array = set_zeros(final_array, size);
     }
